@@ -1,8 +1,8 @@
 import re
 
+from collections import defaultdict
 from pathlib import Path
 from utils import measure_run_time
-
 
 
 class Analyze_RUGAR():
@@ -17,7 +17,7 @@ class Analyze_RUGAR():
         # self.report_path = f"R:\\SSETPI\\Proyectos_SSETPI\\Perfiles OPICS\\Reportes OPICS\\"
         self.report_path = f".\\"
         
-        self.users_info = {}
+        self.users_info = defaultdict(lambda: {"Nombre": "", "Grupos": []})
 
         self.analyze_rugar_report()
 
@@ -28,7 +28,7 @@ class Analyze_RUGAR():
         This function returns the users' information stored in the object.
         :return: The method `get_users_info` is returning the `users_info` attribute of the object.
         """
-        return self.users_info
+        return dict(self.users_info)
 
 
     @measure_run_time
@@ -71,26 +71,24 @@ class Analyze_RUGAR():
         report = Path(self.report_path)
 
         if not report.exists():
-            raise Exception("Archivo no encontrado") 
+            raise FileNotFoundError("Archivo no encontrado") 
 
         with report.open('r', encoding="utf-8") as file:
             lines = file.readlines()
         return lines
     
 
-    def check_phrase_in_specific_string(self, specific_string) -> list[str]:
+    def is_discardable(self, line) -> list[str]:
         """
-        The function `check_phrase_in_specific_string` returns a list of phrases from a given list that
-        are found in a specific string.
+        This function checks if any of the phrases in the `phrases_to_discard` list are present in the
+        input `line`.
         
-        :param specific_string: The `check_phrase_in_specific_string` method takes a specific string as
-        input and checks if any phrases from the `phrases_to_discard` list are present in that specific
-        string. It then returns a list of all the phrases that are found in the specific string
-        :return: A list of phrases from `self.phrases_to_discard` that are found in the
-        `specific_string`.
+        :param line: The `line` parameter in the `is_discardable` method is a string representing a line
+        of text that you want to check for the presence of certain phrases
+        :return: A list of strings is being returned.
         """
-        return [s for s in self.phrases_to_discard if s in specific_string]
-    
+        return any(phrase in line for phrase in self.phrases_to_discard)
+        
 
     def clean_unnecessary_lines(self, original_lines: list[str]) -> list[str]:
         """
@@ -100,7 +98,7 @@ class Analyze_RUGAR():
         :param original_lines: The `clean_unnecessary_lines` method takes a list of strings
         `original_lines` as input and processes each line based on certain conditions. It removes any
         leading or trailing whitespaces from each line and then checks if a specific phrase is present
-        in the line using the `check_phrase_in_specific_string`
+        in the line using the `is_discardable`
         :type original_lines: list[str]
         :return: The function `clean_unnecessary_lines` returns a list of cleaned lines after processing
         the original lines based on certain conditions.
@@ -110,7 +108,7 @@ class Analyze_RUGAR():
         for line in original_lines:
             line = line.strip()
 
-            if not self.check_phrase_in_specific_string(line):
+            if not self.is_discardable(line):
                 if "(IAUD)" in line:
                     line = re.sub(r'\s+', '-', line)
                 elif "Phone" in line:
@@ -146,7 +144,7 @@ class Analyze_RUGAR():
         belong to
         :type data: str
         """
-        operator_id = data[0:4]
+        operator_id = data[:4]
         operator_name = data.split("Operator Name: ")[1].strip().split("Groups:")[0].strip()
         groups = (
             data.split("Groups:")[1].strip().split(' ') 
@@ -154,9 +152,6 @@ class Analyze_RUGAR():
             else []
         )
 
-        if not operator_id in self.users_info:
-            self.users_info[operator_id] = { "Nombre": "", "Grupos": []}
-
         self.users_info[operator_id]["Nombre"] = operator_name
-        self.users_info[operator_id]["Grupos"] = self.users_info[operator_id]["Grupos"] + groups
+        self.users_info[operator_id]["Grupos"].extend(groups)
 
