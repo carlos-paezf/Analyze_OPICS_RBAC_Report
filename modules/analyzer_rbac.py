@@ -1,5 +1,6 @@
 import pandas as pd
 
+from collections import defaultdict
 from unidecode import unidecode
 from utils import measure_run_time, recreate_folders, normalize_str, open_csv_file, saves_json_file, CSV_PATH, JSON_PATH
 
@@ -10,15 +11,14 @@ class Analyze_RBAC():
 
         self.sheet_names = []
 
-        self.rbac_data = {
-            "profiles_users": {},
-            "profiles": {},
-            "profiles_groups": {},
-            "groups": {},
-            "groups_transaction": {},
-            "government": {},
-        }
-
+        self.rbac_data = defaultdict(lambda: {
+            "gobierno": [],
+            "grupo-transaccion": [],
+            "grupos": [],
+            "perfil-grupo": [],
+            "perfil-usuario": [],
+            "perfiles": []
+        })
 
         self.analyze_rbac_report()
 
@@ -26,10 +26,9 @@ class Analyze_RBAC():
     @measure_run_time
     def analyze_rbac_report(self):
         """
-        The function `analyze_rbac_report` recreates folders, reads RBAC information, and converts
-        sheets to JSON format.
+        The function `analyze_rbac_report` reads RBAC information, converts sheets to JSON format, and
+        likely performs further analysis.
         """
-        recreate_folders()
         raw_data = self.read_rbac_info()
         self.convert_sheets_to_json(raw_data)
 
@@ -56,7 +55,8 @@ class Analyze_RBAC():
         for sheet in raw_data.sheet_names:
             dataframe = raw_data.parse(sheet)
             json_data = self.dataframe_to_json_compatible(dataframe)
-            saves_json_file(f"{JSON_PATH}/{sheet}.json", json_data)
+            
+            self.rbac_data[normalize_str(sheet)] = json_data
             
     
     def dataframe_to_json_compatible(self, dataframe: pd.DataFrame) -> list[dict]:
