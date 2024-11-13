@@ -1,6 +1,5 @@
 import re
 
-from collections import defaultdict
 from pathlib import Path
 from utils import measure_run_time
 
@@ -17,10 +16,9 @@ class Analyze_RUGAR():
         # self.report_path = f"R:\\SSETPI\\Proyectos_SSETPI\\Perfiles OPICS\\Reportes OPICS\\"
         self.report_path = f".\\"
         
-        self.users_info = defaultdict(lambda: {"Nombre": "", "Grupos": []})
+        self.users_info = []
 
         self.analyze_rugar_report()
-
 
     
     def get_users_info(self) -> dict:
@@ -135,6 +133,7 @@ class Analyze_RUGAR():
         for user in users_data_raw:
             self.define_user_info(user)
     
+
     def define_user_info(self, data: str) -> None:
         """
         This Python function extracts and stores user information from a given string data.
@@ -152,6 +151,16 @@ class Analyze_RUGAR():
             else []
         )
 
-        self.users_info[operator_id]["Nombre"] = operator_name
-        self.users_info[operator_id]["Grupos"].extend(groups)
+        user_exists = next((user for user in self.users_info if user["usuario_opics"] == operator_id), None)
+
+        if user_exists:
+            existing_groups = set(user_exists["groups"])
+            new_groups = set(groups)
+            user_exists["groups"] = list(existing_groups | new_groups)
+        else:
+            self.users_info.append({
+                "usuario_opics": operator_id,
+                "nombre_del_usuario": operator_name,
+                "groups": groups
+            })
 
