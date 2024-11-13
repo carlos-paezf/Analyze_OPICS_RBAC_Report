@@ -108,3 +108,21 @@ def saves_json_file(path, data) -> None:
     """
     with open(path, mode="w", encoding="utf-8") as file:
         json.dump(data, file, ensure_ascii=False, indent=4)
+
+
+def array_diff(a: list, b: list) -> list:
+    """
+    The function `array_diff` takes two lists `a` and `b` as input and returns a new list containing
+    elements from `a` that are not present in `b`.
+    
+    :param a: The parameter `a` in the `array_diff` function is a list of elements from which we want to
+    remove elements that are also present in another list `b`
+    :type a: list
+    :param b: The parameter `b` in the `array_diff` function is a list that contains elements to be
+    removed from list `a`. The function will return a new list that contains only the elements from list
+    `a` that are not present in list `b`
+    :type b: list
+    :return: This function `array_diff` takes two lists `a` and `b` as input and returns a new list
+    containing elements from list `a` that are not present in list `b`.
+    """
+    return [x for x in a if x not in b]
