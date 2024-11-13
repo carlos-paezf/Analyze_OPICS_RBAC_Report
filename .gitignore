@@ -1,0 +1,7 @@
+RBAC Plantilla Aplicaciones OPICS.xlsx
+/*.rpt
+
+/files/csv/*
+/files/json/*
+
+/*/__pycache__
