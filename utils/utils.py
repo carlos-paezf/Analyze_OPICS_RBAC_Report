@@ -4,6 +4,13 @@ import os
 import re
 import time
 
+from unidecode import unidecode
+from shutil import rmtree
+
+
+CSV_PATH = './files/csv'
+JSON_PATH = './files/json'
+
 
 def measure_run_time(func):
     """
@@ -40,22 +47,24 @@ def normalize_str(original_str: str):
     like special symbols or parentheses. The normalized string is then returned.
     """
     pattern_1 = re.compile(r' - |, |\s|\.')
-    pattern_2 = re.compile(r'\ufeff|\(|\)')
+    pattern_2 = re.compile(r'\n|\ufeff|\(|\)')
 
-    return pattern_2.sub(
-        '', pattern_1.sub(
-            '_', original_str.strip().lower()
+    return unidecode(
+        pattern_1.sub(
+            '_', pattern_2.sub(
+                '', original_str.strip().lower()
+            )
         )
     )
 
 
-def create_folders():
+def recreate_folders():
     """
-    The function `create_folders` creates two folders named `csv` and `json` inside a directory named
-    `files`.
+    The function `recreate_folders` deletes and recreates a directory specified by the variable
+    `JSON_PATH`.
     """
-    os.makedirs('./files/csv', exist_ok=True)
-    os.makedirs('./files/json', exist_ok=True)
+    rmtree(JSON_PATH)
+    os.makedirs(JSON_PATH, exist_ok=True)
 
 
 def open_csv_file(path):
@@ -98,4 +107,4 @@ def saves_json_file(path, data) -> None:
     JSON-serializable object that you want to save to a file in JSON format
     """
     with open(path, mode="w", encoding="utf-8") as file:
-        file.write(json.dumps(data, indent=4))
+        json.dump(data, file, ensure_ascii=False, indent=4)
