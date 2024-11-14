@@ -1,7 +1,7 @@
 import re
 
 from pathlib import Path
-from utils import measure_run_time
+from utils import measure_run_time, OPICSKeys
 
 
 class Analyze_RUGAR():
@@ -151,16 +151,16 @@ class Analyze_RUGAR():
             else []
         )
 
-        user_exists = next((user for user in self.users_info if user["usuario_opics"] == operator_id), None)
+        user_exists = next((user for user in self.users_info if user[OPICSKeys.USER] == operator_id), None)
 
         if user_exists:
-            existing_groups = set(user_exists["groups"])
+            existing_groups = set(user_exists[OPICSKeys.GROUPS])
             new_groups = set(groups)
-            user_exists["groups"] = list(existing_groups | new_groups)
+            user_exists[OPICSKeys.GROUPS] = list(existing_groups | new_groups)
         else:
             self.users_info.append({
-                "usuario_opics": operator_id,
-                "nombre_del_usuario": operator_name,
-                "groups": groups
+                OPICSKeys.USER: operator_id,
+                OPICSKeys.USERNAME: operator_name,
+                OPICSKeys.GROUPS: groups
             })
 
