@@ -12,7 +12,7 @@ warnings.filterwarnings(
 
 if __name__ == '__main__':
     opics_data = Analyze_RUGAR().users_info
-        
+
     rbac_data = Analyze_RBAC().rbac_data
 
-    Compare_Data(opics_data, rbac_data).compare_users()
+    Compare_Data(opics_data, rbac_data).compare_users_in_reports()
