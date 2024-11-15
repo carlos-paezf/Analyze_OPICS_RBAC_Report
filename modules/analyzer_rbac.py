@@ -1,8 +1,7 @@
 import pandas as pd
-
-from collections import defaultdict
 from unidecode import unidecode
-from utils import measure_run_time, recreate_folders, normalize_str, open_csv_file, saves_json_file, CSV_PATH, JSON_PATH
+
+from utils import RBACKeys, measure_run_time, normalize_str
 
 
 class Analyze_RBAC():
@@ -11,14 +10,15 @@ class Analyze_RBAC():
 
         self.sheet_names = []
 
-        self.rbac_data = defaultdict(lambda: {
-            "gobierno": [],
-            "grupo-transaccion": [],
-            "grupos": [],
-            "perfil-grupo": [],
-            "perfil-usuario": [],
-            "perfiles": []
-        })
+        self.rbac_data = {
+            RBACKeys.GOVERNMENT: [],
+            RBACKeys.GROUP_TRANSACTION: [],
+            RBACKeys.GROUPS: [],
+            RBACKeys.PROFILES_GROUPS: [],
+            RBACKeys.PROFILES_USERS: [],
+            RBACKeys.PROFILES: []
+        }
+        
 
         self.analyze_rbac_report()
 
@@ -31,6 +31,7 @@ class Analyze_RBAC():
         """
         raw_data = self.read_rbac_info()
         self.convert_sheets_to_json(raw_data)
+        self.define_profile_groups()
 
     
     def read_rbac_info(self) -> pd.ExcelFile:
@@ -79,8 +80,44 @@ class Analyze_RBAC():
 
         return [
             {
-                normalize_str(key): (value.replace('\n', ' ') if isinstance(value, str) else value)
+                normalize_str(key): (unidecode(value.replace('\n', ' ')) if isinstance(value, str) else value)
                 for key, value in row.items()
             }
             for row in dataframe.to_dict(orient="records")
         ]
+    
+
+    def define_profile_groups(self) -> list[dict]:
+        """
+        This Python function defines profile groups based on input data and returns a list of
+        dictionaries representing profiles and their associated groups.
+        :return: The function `define_profile_groups` returns a list of dictionaries where each
+        dictionary represents a profile and its associated groups.
+        """
+        raw_profiles_groups = self.rbac_data[RBACKeys.PROFILES_GROUPS]
+
+        profiles_groups = []
+
+        print(len(raw_profiles_groups))
+        
+        for i in raw_profiles_groups:
+            profile = i["perfil"]
+            
+            profile_exists = next(
+                (
+                    profile_group 
+                    for profile_group in profiles_groups 
+                    if profile_group["profile"] == profile
+                ), 
+                None
+            )
+
+            group = i["grupos"]
+
+            if not profile_exists:
+                profiles_groups.append({"profile": profile, "groups": [group]})
+            else:
+                if group not in profile_exists["groups"]:
+                    profile_exists["groups"].append(group)
+
+        return profiles_groups
