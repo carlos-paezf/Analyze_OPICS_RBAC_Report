@@ -1,7 +1,8 @@
 import pandas as pd
 from unidecode import unidecode
 
-from utils import RBACKeys, measure_run_time, normalize_str
+from utils import RBACKeys, normalize_str
+from measure_run_time import measure_run_time
 
 
 class Analyze_RBAC():

@@ -1,7 +1,8 @@
 import re
 
 from pathlib import Path
-from utils import measure_run_time, OPICSKeys
+from utils import OPICSKeys
+from measure_run_time import measure_run_time
 
 
 class Analyze_RUGAR():
