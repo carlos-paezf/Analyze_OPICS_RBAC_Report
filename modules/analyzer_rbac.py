@@ -1,8 +1,8 @@
 import pandas as pd
+from measure_run_time import measure_run_time
 from unidecode import unidecode
 
 from utils import RBACKeys, normalize_str
-from measure_run_time import measure_run_time
 
 
 class Analyze_RBAC():
@@ -33,6 +33,7 @@ class Analyze_RBAC():
         raw_data = self.read_rbac_info()
         self.convert_sheets_to_json(raw_data)
         self.define_profile_groups()
+        self.define_users_groups()
 
     
     def read_rbac_info(self) -> pd.ExcelFile:
@@ -98,8 +99,6 @@ class Analyze_RBAC():
         raw_profiles_groups = self.rbac_data[RBACKeys.PROFILES_GROUPS]
 
         profiles_groups = []
-
-        print(len(raw_profiles_groups))
         
         for i in raw_profiles_groups:
             profile = i["perfil"]
@@ -113,7 +112,7 @@ class Analyze_RBAC():
                 None
             )
 
-            group = i["grupos"]
+            group = i["grupos"].strip()
 
             if not profile_exists:
                 profiles_groups.append({"profile": profile, "groups": [group]})
@@ -122,3 +121,19 @@ class Analyze_RBAC():
                     profile_exists["groups"].append(group)
 
         return profiles_groups
+    
+
+    def define_users_groups(self):
+        """
+        The function `define_users_groups` assigns groups to user profiles based on profile-group
+        mappings.
+        :return: The function `define_users_groups` is returning the updated
+        `self.rbac_data[RBACKeys.PROFILES_USERS]` after assigning the corresponding groups to each user
+        profile based on the matching profile in `profiles_groups`.
+        """
+        profiles_groups = self.define_profile_groups()
+
+        for i in self.rbac_data[RBACKeys.PROFILES_USERS]:    
+            for j in profiles_groups:
+                if j['profile'] == i['perfil']:
+                    i["grupos"] = j['groups']

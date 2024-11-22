@@ -1,8 +1,9 @@
 import re
-
 from pathlib import Path
-from utils import OPICSKeys
+
 from measure_run_time import measure_run_time
+
+from utils import OPICSKeys
 
 
 class Analyze_RUGAR():
@@ -42,7 +43,7 @@ class Analyze_RUGAR():
         original_lines = self.extract_lines()
         clean_lines = self.clean_unnecessary_lines(original_lines)
 
-        self.depure_data(clean_lines)
+        self.define_users_info(clean_lines)
 
 
     def set_report_date(self) -> None:
@@ -118,7 +119,7 @@ class Analyze_RUGAR():
         return clean_lines
     
 
-    def depure_data(self, clean_lines: list[str]) -> None:
+    def define_users_info(self, clean_lines: list[str]) -> None:
         """
         The function `depure_data` processes a list of clean lines to extract user data and then calls
         another method to define user information.
@@ -132,10 +133,10 @@ class Analyze_RUGAR():
         users_data_raw = data_string.split('OperatorID: ')[1::]
 
         for user in users_data_raw:
-            self.define_user_info(user)
+            self.depure_data(user)
     
 
-    def define_user_info(self, data: str) -> None:
+    def depure_data(self, data: str) -> None:
         """
         This Python function extracts and stores user information from a given string data.
         

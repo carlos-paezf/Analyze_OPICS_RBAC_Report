@@ -11,8 +11,16 @@ warnings.filterwarnings(
 
 
 if __name__ == '__main__':
-    opics_data = Analyze_RUGAR().users_info
+    rugar = Analyze_RUGAR()
+    rbac = Analyze_RBAC()
 
-    rbac_data = Analyze_RBAC().rbac_data
+    opics_data = rugar.users_info
+    rbac_data = rbac.rbac_data
 
-    Compare_Data(opics_data, rbac_data).compare_users_in_reports()
+    compare_data = Compare_Data(opics_data, rbac_data)
+    [opics_not_in_rbac, rbac_not_in_opics] = compare_data.compare_users_in_reports()
+    reports_diff = compare_data.compare_users_profiles()
+
+    print("opics_not_in_rbac: ", opics_not_in_rbac)
+    print("rbac_not_in_opics: ", rbac_not_in_opics)
+    print("reports_diff: ", reports_diff)
