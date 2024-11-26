@@ -2,7 +2,7 @@ import pandas as pd
 from measure_run_time import measure_run_time
 from unidecode import unidecode
 
-from utils import RBACKeys, normalize_str
+from utils import RBAC_Keys, RBAC_Profile_Keys, RBAC_Profile_Group_Keys, normalize_str
 
 
 class Analyze_RBAC():
@@ -12,12 +12,12 @@ class Analyze_RBAC():
         self.sheet_names = []
 
         self.rbac_data = {
-            RBACKeys.GOVERNMENT: [],
-            RBACKeys.GROUP_TRANSACTION: [],
-            RBACKeys.GROUPS: [],
-            RBACKeys.PROFILES_GROUPS: [],
-            RBACKeys.PROFILES_USERS: [],
-            RBACKeys.PROFILES: []
+            RBAC_Keys.GOVERNMENT: [],
+            RBAC_Keys.GROUP_TRANSACTION: [],
+            RBAC_Keys.GROUPS: [],
+            RBAC_Keys.PROFILES_GROUPS: [],
+            RBAC_Keys.PROFILES_USERS: [],
+            RBAC_Keys.PROFILES: []
         }
         
 
@@ -32,6 +32,7 @@ class Analyze_RBAC():
         """
         raw_data = self.read_rbac_info()
         self.convert_sheets_to_json(raw_data)
+        self.depure_profiles_data()
         self.define_profile_groups()
         self.define_users_groups()
 
@@ -96,29 +97,29 @@ class Analyze_RBAC():
         :return: The function `define_profile_groups` returns a list of dictionaries where each
         dictionary represents a profile and its associated groups.
         """
-        raw_profiles_groups = self.rbac_data[RBACKeys.PROFILES_GROUPS]
+        raw_profiles_groups = self.rbac_data[RBAC_Keys.PROFILES_GROUPS]
 
         profiles_groups = []
         
         for i in raw_profiles_groups:
-            profile = i["perfil"]
+            profile = i[RBAC_Profile_Group_Keys.PROFILE]
             
             profile_exists = next(
                 (
                     profile_group 
                     for profile_group in profiles_groups 
-                    if profile_group["profile"] == profile
+                    if profile_group[RBAC_Profile_Group_Keys.PROFILE] == profile
                 ), 
                 None
             )
 
-            group = i["grupos"].strip()
+            group = i[RBAC_Profile_Group_Keys.GROUPS].strip()
 
             if not profile_exists:
-                profiles_groups.append({"profile": profile, "groups": [group]})
+                profiles_groups.append({RBAC_Profile_Group_Keys.PROFILE: profile, RBAC_Profile_Group_Keys.GROUPS: [group]})
             else:
-                if group not in profile_exists["groups"]:
-                    profile_exists["groups"].append(group)
+                if group not in profile_exists[RBAC_Profile_Group_Keys.GROUPS]:
+                    profile_exists[RBAC_Profile_Group_Keys.GROUPS].append(group)
 
         return profiles_groups
     
@@ -133,7 +134,18 @@ class Analyze_RBAC():
         """
         profiles_groups = self.define_profile_groups()
 
-        for i in self.rbac_data[RBACKeys.PROFILES_USERS]:    
+        for i in self.rbac_data[RBAC_Keys.PROFILES_USERS]:    
             for j in profiles_groups:
-                if j['profile'] == i['perfil']:
-                    i["grupos"] = j['groups']
+                if j[RBAC_Profile_Keys.PROFILE] == i[RBAC_Profile_Keys.PROFILE]:
+                    i[RBAC_Profile_Group_Keys.GROUPS] = j[RBAC_Profile_Group_Keys.GROUPS]
+
+    
+    def depure_profiles_data(self):
+        """
+        This function filters out profiles with a non-None "perfil" attribute that does not contain the
+        substring "Nota: ".
+        """
+        self.rbac_data[RBAC_Keys.PROFILES] = [
+            profile for profile in self.rbac_data[RBAC_Keys.PROFILES]
+            if profile[RBAC_Profile_Keys.PROFILE] is not None and "Nota: " not in profile[RBAC_Profile_Keys.PROFILE]
+        ]

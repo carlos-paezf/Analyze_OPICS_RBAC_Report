@@ -3,7 +3,7 @@ from pathlib import Path
 
 from measure_run_time import measure_run_time
 
-from utils import OPICSKeys
+from utils import OPICS_Keys, RUGAR_Keys
 
 
 class Analyze_RUGAR():
@@ -112,7 +112,7 @@ class Analyze_RUGAR():
                 if "(IAUD)" in line:
                     line = re.sub(r'\s+', '-', line)
                 elif "Phone" in line:
-                    line = "Groups:"
+                    line = RUGAR_Keys.GROUPS.value
                 
                 clean_lines.append(f"{line} ")
 
@@ -130,7 +130,7 @@ class Analyze_RUGAR():
         :type clean_lines: list[str]
         """
         data_string = re.sub(r'[\n\x0c]', ' ', ''.join(clean_lines))
-        users_data_raw = data_string.split('OperatorID: ')[1::]
+        users_data_raw = data_string.split(RUGAR_Keys.OPERATOR_ID)[1::]
 
         for user in users_data_raw:
             self.depure_data(user)
@@ -146,23 +146,23 @@ class Analyze_RUGAR():
         :type data: str
         """
         operator_id = data[:4]
-        operator_name = data.split("Operator Name: ")[1].strip().split("Groups:")[0].strip()
+        operator_name = data.split(RUGAR_Keys.OPERATOR_NAME)[1].strip().split(RUGAR_Keys.GROUPS)[0].strip()
         groups = (
-            data.split("Groups:")[1].strip().split(' ') 
-            if data.split("Groups:")[1].strip() != "" 
+            data.split(RUGAR_Keys.GROUPS)[1].strip().split(' ') 
+            if data.split(RUGAR_Keys.GROUPS)[1].strip() != "" 
             else []
         )
 
-        user_exists = next((user for user in self.users_info if user[OPICSKeys.USER] == operator_id), None)
+        user_exists = next((user for user in self.users_info if user[OPICS_Keys.USER] == operator_id), None)
 
         if user_exists:
-            existing_groups = set(user_exists[OPICSKeys.GROUPS])
+            existing_groups = set(user_exists[OPICS_Keys.GROUPS])
             new_groups = set(groups)
-            user_exists[OPICSKeys.GROUPS] = list(existing_groups | new_groups)
+            user_exists[OPICS_Keys.GROUPS] = list(existing_groups | new_groups)
         else:
             self.users_info.append({
-                OPICSKeys.USER: operator_id,
-                OPICSKeys.USERNAME: operator_name,
-                OPICSKeys.GROUPS: groups
+                OPICS_Keys.USER: operator_id,
+                OPICS_Keys.USERNAME: operator_name,
+                OPICS_Keys.GROUPS: groups
             })
 
