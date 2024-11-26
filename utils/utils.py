@@ -2,9 +2,7 @@ import csv
 import json
 import os
 import re
-import time
 
-from enum import Enum
 from unidecode import unidecode
 from shutil import rmtree
 
@@ -12,23 +10,6 @@ from shutil import rmtree
 CSV_PATH = './files/csv'
 JSON_PATH = './files/json'
 
-
-# The class `RBACKeys` defines enumerated keys related to government, groups, transactions, profiles,
-# and user permissions.
-class RBACKeys(str, Enum):
-    GOVERNMENT = "gobierno"
-    GROUPS = "grupos"
-    GROUP_TRANSACTION = "grupo-transaccion"
-    PROFILES = "perfiles"
-    PROFILES_GROUPS = "perfil-grupo"
-    PROFILES_USERS = "perfil-usuario"
-
-
-# The class `OPICSKeys` defines enumeration constants for keys related to user information in OPICS.
-class OPICSKeys(str, Enum):
-    USER = "usuario_opics"
-    USERNAME = "nombre_del_usuario"
-    GROUPS = "grupos"
 
 
 def normalize_str(original_str: str):
