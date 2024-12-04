@@ -1,8 +1,6 @@
 import re
 from pathlib import Path
 
-from measure_run_time import measure_run_time
-
 from utils import OPICS_Keys, RUGAR_Keys
 
 
@@ -20,7 +18,8 @@ class Analyze_RUGAR():
         
         self.users_info = []
 
-        self.analyze_rugar_report()
+        self.set_report_date()
+        self.set_report_path()
 
     
     def get_users_info(self) -> dict:
@@ -31,15 +30,11 @@ class Analyze_RUGAR():
         return dict(self.users_info)
 
 
-    @measure_run_time
     def analyze_rugar_report(self) -> None:
         """
         The `analyze_report` function processes a report by setting the date and path, extracting and
         cleaning lines, depuring data, and printing user information.
         """
-        self.set_report_date()
-        self.set_report_path()
-
         original_lines = self.extract_lines()
         clean_lines = self.clean_unnecessary_lines(original_lines)
 
@@ -71,7 +66,7 @@ class Analyze_RUGAR():
         report = Path(self.report_path)
 
         if not report.exists():
-            raise FileNotFoundError("Archivo no encontrado") 
+            raise FileNotFoundError(f"Archivo no encontrado: {report}") 
 
         with report.open('r', encoding="utf-8") as file:
             lines = file.readlines()

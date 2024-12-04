@@ -1,5 +1,4 @@
 import pandas as pd
-from measure_run_time import measure_run_time
 from unidecode import unidecode
 
 from utils import RBAC_Keys, RBAC_Profile_Keys, RBAC_Profile_Group_Keys, normalize_str
@@ -19,12 +18,8 @@ class Analyze_RBAC():
             RBAC_Keys.PROFILES_USERS: [],
             RBAC_Keys.PROFILES: []
         }
-        
-
-        self.analyze_rbac_report()
 
        
-    @measure_run_time
     def analyze_rbac_report(self):
         """
         The function `analyze_rbac_report` reads RBAC information, converts sheets to JSON format, and
