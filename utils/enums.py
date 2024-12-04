@@ -10,6 +10,7 @@ class RBAC_Keys(str, Enum):
     PROFILES = "perfiles"
     PROFILES_GROUPS = "perfil-grupo"
     PROFILES_USERS = "perfil-usuario"
+    USER = "usuario_opics"
 
 
 class RUGAR_Keys(str, Enum):
