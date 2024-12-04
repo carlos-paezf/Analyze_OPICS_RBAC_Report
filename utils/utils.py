@@ -105,3 +105,23 @@ def array_diff(a: list, b: list) -> list:
     containing elements from list `a` that are not present in list `b`.
     """
     return [x for x in a if x not in b]
+
+
+def array_object_diff(a: list[dict], b: list[dict], key: str) -> list:
+    """
+    The function `array_object_diff` takes two lists of dictionaries and a key, and returns a list of
+    dictionaries from the first list that have a key value not present in the second list.
+    
+    :param a: The parameter `a` is a list of dictionaries
+    :type a: list[dict]
+    :param b: b is a list of dictionaries
+    :type b: list[dict]
+    :param key: The `key` parameter in the `array_object_diff` function is a string that represents the
+    key in the dictionaries within the input lists `a` and `b` that will be used to compare the objects
+    for differences
+    :type key: str
+    :return: The function `array_object_diff` returns a list of dictionaries from list `a` that have a
+    value for the specified key that is not present in any dictionary in list `b`.
+    """
+    b_key_values = {item[key] for item in b}
+    return [x for x in a if x[key] not in b_key_values]
