@@ -83,6 +83,14 @@ class App_GUI(tk.Tk):
 
 
     def show_loading_screen(self, task_function, *args):
+        """
+        The function `show_loading_screen` creates a loading window with a progress bar while executing
+        a given task function in a separate thread.
+        
+        :param task_function: The `task_function` parameter in the `show_loading_screen` method is a
+        function that you want to execute while showing a loading screen. This function will be called
+        with the arguments `*args` that are passed to the `show_loading_screen` method
+        """
         loading_window = tk.Toplevel(self)
         loading_window.title("Cargando")
         loading_window.geometry("300x200")
