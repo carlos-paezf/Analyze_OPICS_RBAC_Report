@@ -77,8 +77,10 @@ class Compare_Data():
                         "rbac_user": rbac_user_id,
                         "opics_user": opics_user[OPICS_Keys.USER],
                         "rbac_profile": rbac_user["perfil"],
+                        "rbac_groups": rbac_groups,
                         "rbac_groups_not_in_opics_groups": rbac_groups_diff,
-                        "opics_groups_not_in_rbac_groups": opics_groups_diff
+                        "opics_groups": opics_groups,
+                        "opics_groups_not_in_rbac_groups": opics_groups_diff,
                     })
 
         return diff
